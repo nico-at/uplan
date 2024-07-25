@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import PostgresDsn, RedisDsn
+from pydantic import PostgresDsn, RedisDsn, Field, computed_field
+
 
 class Settings(BaseSettings):
     sqlite_url: str
@@ -23,8 +24,26 @@ class Settings(BaseSettings):
     redis_port: int
 
     redis_dsn: RedisDsn
-    postgres_dsn: PostgresDsn
 
-    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
+    # PostgreSQL settings
+    postgres_host: str = Field("localhost", env="POSTGRES_HOST")
+    postgres_port: int = Field(5432, env="POSTGRES_PORT")
+    postgres_db: str = Field(..., env="POSTGRES_DB")
+    postgres_user: str = Field(..., env="POSTGRES_USER")
+    postgres_password: str = Field(..., env="POSTGRES_PASSWORD")
+
+    @computed_field
+    def postgres_dsn(self) -> PostgresDsn:
+        return PostgresDsn.build(
+            scheme="postgresql",
+            username=self.postgres_user,
+            password=self.postgres_password,
+            host=self.postgres_host,
+            port=self.postgres_port,
+            path=self.postgres_db,
+        )
+
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+
 
 settings = Settings()

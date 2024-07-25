@@ -8,3 +8,5 @@ fastapi
 slowapi
 requests-cache
 psycopg2
+pytest
+httpx
