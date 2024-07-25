@@ -1,0 +1,137 @@
+:root {
+    --primary-color: #0063a6;
+    --bg-color: #f4f4f4;
+    --text-color: #333;
+    --code-bg: #e9ecef;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    background-color: #fff;
+    padding: 2rem;
+    padding-bottom: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    box-sizing: border-box;
+}
+
+.description {
+    text-align: justify;
+    
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+h1 {
+    color: var(--primary-color);
+    text-align: center;
+    margin-bottom: 1.5rem;
+    margin-top: 0rem;
+    font-size: 2.5rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.input-group {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+.input-wrapper {
+    flex: 1;
+}
+
+.input-wrapper:last-child {
+    flex: 0 0 100px;
+}
+
+input[type="text"],
+select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: inherit;
+    box-sizing: border-box;
+
+}
+
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333333' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.7rem top 50%;
+    background-size: 0.65rem auto;
+    padding-right: 2rem;
+}
+
+button {
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+button:hover {
+    background-color: #004d80;
+}
+
+#result {
+    
+    border-radius: 4px;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.success {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: var(--code-bg);
+    border: 1px solid #ccc;
+}
+
+.error {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #ffebee;
+    border: 1px solid #ffcdd2;
+    color: #b71c1c;
+}
+
+.disclaimer {
+    font-size: 0.8rem;
+    color: #666;
+    text-align: center;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    border-top: 1px solid #ddd;
+}

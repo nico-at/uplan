@@ -1,0 +1,10 @@
+redis
+requests
+pydantic
+pydantic-settings
+sqlmodel
+icalendar
+fastapi
+slowapi
+requests-cache
+psycopg2

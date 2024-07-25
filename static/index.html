@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>u:plan</title>
+    <link rel="stylesheet" href="static/styles.css">
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+
+    <!-- Open Graph meta tags -->
+    <meta property="og:title" content="u:plan">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://uplan.at">
+    <meta property="og:description" content="Create automatically updating ICS feeds for your courses">
+</head>
+
+
+<body>
+    <div class="container">
+        <h1>u:plan</h1>
+        <p class="description">Create automatically updating ICS feeds for your courses without violating the u:find
+            terms. These feeds can be easily added to any calendar app like iOS Calendar or Google Calendar,
+            keeping your schedule always up to date.</p>
+        <form id="planForm">
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <label for="courses">Course IDs</label>
+                    <input type="text" id="courses" name="courses" required placeholder="Comma-separated e.g.,  051011,051012-3">
+                </div>
+                <div class="input-wrapper">
+                    <label for="semester">Semester</label>
+                    <select id="semester" name="semester" required>
+                        <option value="2023W">2025S</option>
+                        <option value="2024W" selected>2024W</option>
+                        <option value="2024S">2024S</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit">Create ICS Feed</button>
+        </form>
+        <div id="result"></div>
+        <div class="disclaimer">
+            <p><strong>Disclaimer:</strong> This application is not provided by the University of Vienna. The University
+                of Vienna assumes no responsibility for data accuracy and is not liable for any damages incurred by
+                users or third parties in connection with the use of this data.</p>
+        </div>
+    </div>
+
+    <script src="static/script.js"></script>
+</body>
+
+</html>
