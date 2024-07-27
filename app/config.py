@@ -20,9 +20,13 @@ class Settings(BaseSettings):
     default_feed_id_length: int
     max_courses_per_feed: int
 
+    # Rate limiting settings
+    rate_limit_window: int
+    rate_limit_requests: int
+
+    # Redis settings
     redis_host: str
     redis_port: int
-
     redis_dsn: RedisDsn
 
     # PostgreSQL settings

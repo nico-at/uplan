@@ -2,14 +2,70 @@ import re
 import random
 import string
 import requests
+import time
+import redis
 
 from xml.etree import ElementTree
 from sqlmodel import Session, select
 from typing import List, Optional
+from functools import wraps
+from requests_cache import CachedSession
+from fastapi import HTTPException
 
 from .config import settings
 from .logger import logger
 from .models import Course, Feed
+
+cached_session = CachedSession(
+    "cache",
+    backend="redis",
+    host=settings.redis_host,
+    port=settings.redis_port,
+    expire_after=3600,
+)
+
+redis_client = redis.Redis(host=settings.redis_host, port=settings.redis_port)
+
+
+def rate_limit(func):
+    @wraps(func)
+    def wrapper(url: str | bytes, remote_address: str, *args, **kwargs):
+        if not remote_address:
+            return func(url, remote_address, *args, **kwargs)
+        
+        # Check rate limit
+        rate_key = f"rate:{remote_address}"
+        current_time = int(time.time())
+        window_start = current_time - settings.rate_limit_window
+
+        # Remove old entries
+        redis_client.zremrangebyscore(rate_key, 0, window_start)
+
+        # Count requests in the current window
+        request_count = redis_client.zcard(rate_key)
+        if request_count >= settings.rate_limit_requests:
+            raise HTTPException(status_code=429, detail="Too Many Requests")
+
+        # Make the request
+        response = func(url, remote_address, *args, **kwargs)
+
+        # If the response wasn't from cache, add to rate limit
+        if not response.from_cache:
+            # Add current request to the sorted set
+            redis_client.zadd(rate_key, {str(current_time): current_time})
+            # Set TTL for the rate limit key (twice the window to be safe)
+            redis_client.expire(rate_key, settings.rate_limit_window * 2)
+        return response
+
+    return wrapper
+
+
+@rate_limit
+def request_limited(url: str | bytes, remote_address: str) -> requests.Response:
+    """Limit the number of requests to a given URL for a given remote address."""
+    response = cached_session.get(url, headers={"User-Agent": settings.user_agent})
+    response.raise_for_status()
+    return response
 
 
 def generate_unique_path(session: Session) -> str:
@@ -27,10 +83,12 @@ def generate_unique_path(session: Session) -> str:
     )
 
 
-def get_current_semester() -> Optional[str]:
+def get_current_semester(remote_address: Optional[str] = None) -> Optional[str]:
     """Fetch the current semester from the university's API."""
     try:
-        response = requests.get(settings.url_current_semester, headers={"User-Agent": settings.user_agent})
+        response = request_limited(
+            url=settings.url_current_semester, remote_address=remote_address
+        )
         response.raise_for_status()
 
         semester = response.text.strip()
@@ -46,19 +104,23 @@ def get_current_semester() -> Optional[str]:
 
 
 def validate_course_path(
-    path: str, semester: str, group: Optional[int] = None
+    path: str,
+    semester: str,
+    group: Optional[int] = None,
+    remote_address: Optional[str] = None,
 ) -> Course:
     """
     Validates if a course exists and if the specified group is valid.
     Returns a Course object.
     """
     try:
-        response = requests.get(
-            settings.url_course_template.format(id=path, semester=semester), headers={"User-Agent": settings.user_agent}
+        response = request_limited(
+            url=settings.url_course_template.format(id=path, semester=semester),
+            remote_address=remote_address,
         )
         response.raise_for_status()
-        namespaces = {"xml": "http://www.w3.org/XML/1998/namespace"}
 
+        namespaces = {"xml": "http://www.w3.org/XML/1998/namespace"}
         root = ElementTree.fromstring(response.content)
 
         # Extract longname (preferring German, falling back to English)
@@ -98,7 +160,7 @@ def validate_course_path(
 
 
 def find_or_create_course(
-    session: Session, path: str, group: int, semester: str
+    session: Session, path: str, group: int, semester: str, remote_address: str
 ) -> Course:
     """Find an existing course or create a new one if it doesn't exist."""
     try:
@@ -112,7 +174,9 @@ def find_or_create_course(
             logger.info(f"Found existing course: {path}-{group} ({semester})")
             return existing_course
 
-        new_course = validate_course_path(path=path, semester=semester, group=group)
+        new_course = validate_course_path(
+            path=path, semester=semester, group=group, remote_address=remote_address
+        )
 
         session.add(new_course)
         session.commit()

@@ -3,11 +3,12 @@ from fastapi.responses import Response, FileResponse
 from sqlmodel import Session
 from typing import Optional
 
+import asyncio
+
 from .database import get_session
 from .services import create_feed_service, get_combined_feed_service
 from .logger import logger
 from .models import FeedResponse
-from .limiter import limiter
 
 router = APIRouter()
 
@@ -23,7 +24,6 @@ async def index():
     description="Generates an ICS feed for the specified courses.",
     response_model=FeedResponse,
 )
-@limiter.limit("5/minute")
 async def create_feed(
     request: Request,
     courses: str,
@@ -41,7 +41,8 @@ async def create_feed(
     - JSONResponse: A JSON response containing the generated feed.
     """
     try:
-        return create_feed_service(courses, semester, session)
+        # await asyncio.sleep(1)
+        return create_feed_service(courses, semester, session, request.client.host)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
@@ -54,7 +55,9 @@ async def create_feed(
     summary="Get Combined Feed",
     description="Retrieves a combined feed based on the specified ID.",
 )
-async def get_combined_feed(id: str, session: Session = Depends(get_session)):
+async def get_combined_feed(
+    request: Request, id: str, session: Session = Depends(get_session)
+):
     """
     Retrieves a combined feed based on the specified ID.
 
@@ -65,7 +68,7 @@ async def get_combined_feed(id: str, session: Session = Depends(get_session)):
     - Response: An iCalendar (.ics) file containing the combined feed.
     """
     try:
-        result = get_combined_feed_service(id, session)
+        result = get_combined_feed_service(id, session, request.client.host)
         return Response(
             content=result,
             media_type="text/calendar",

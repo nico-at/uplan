@@ -1,28 +1,14 @@
-import requests_cache
 from datetime import datetime
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
-from slowapi import _rate_limit_exceeded_handler
-from slowapi.errors import RateLimitExceeded
-
 from .routes import router
 from .database import create_db_and_tables
 from .logger import logger
 from .utils import get_current_semester
-from .limiter import limiter
-from .config import settings
 
-
-# Set up global caching with requests-cache using Redis
-requests_cache.install_cache(
-    backend='redis',
-    host=settings.redis_host,
-    port=settings.redis_port,
-    expire_after=3600
-)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -35,14 +21,10 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(lifespan=lifespan, docs_url='/api-docs')
-
+app = FastAPI(lifespan=lifespan, docs_url="/api-docs")
 app.mount("/static", StaticFiles(directory="static"), name="static")
-
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-
 app.include_router(router)
+
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):

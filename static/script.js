@@ -4,6 +4,12 @@ document.getElementById('planForm').addEventListener('submit', function (e) {
     const courses = document.getElementById('courses').value.replace(/\s+/g, '');
     const semester = document.getElementById('semester').value.replace(/\s+/g, '');
     const resultDiv = document.getElementById('result');
+    const submitButton = document.querySelector('button[type="submit"]');
+
+    // Show loading message
+    resultDiv.innerHTML = 'Generating your ICS feed, please wait...';
+    resultDiv.className = 'success';
+    submitButton.disabled = true;
 
     fetch(`/create?courses=${courses}&semester=${semester}`)
         .then(async response => {
@@ -24,5 +30,8 @@ document.getElementById('planForm').addEventListener('submit', function (e) {
         .catch(error => {
             resultDiv.textContent = `${error.message}`;
             resultDiv.className = 'error';
+        }).finally(() => {
+            // Re-enable button after response is handled
+            submitButton.disabled = false;
         });
 });

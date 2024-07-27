@@ -6,7 +6,7 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Roboto", sans-serif, Arial, Helvetica, sans-serif;
     line-height: 1.6;
     color: var(--text-color);
     background-color: var(--bg-color);
@@ -25,7 +25,7 @@ body {
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 600px;
+    max-width: 660px;
     box-sizing: border-box;
 }
 
@@ -73,7 +73,6 @@ select {
     border-radius: 4px;
     font-family: inherit;
     box-sizing: border-box;
-
 }
 
 select {
@@ -100,7 +99,12 @@ button {
     box-sizing: border-box;
 }
 
-button:hover {
+button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+button:enabled:hover {
     background-color: #004d80;
 }
 
@@ -134,4 +138,13 @@ button:hover {
     margin-top: 1rem;
     padding: 0.5rem;
     border-top: 1px solid #ddd;
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
 }

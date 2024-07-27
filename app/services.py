@@ -6,13 +6,18 @@ from sqlmodel import Session, select
 from icalendar import Calendar
 
 from .models import Feed, FeedResponse
-from .config import settings 
-from .utils import get_current_semester, find_or_create_course, find_or_create_feed
+from .config import settings
+from .utils import (
+    get_current_semester,
+    find_or_create_course,
+    find_or_create_feed,
+    request_limited,
+)
 from .logger import logger
 
 
 def create_feed_service(
-    courses: str, semester: Optional[str], session: Session
+    courses: str, semester: Optional[str], session: Session, remote_address: str
 ) -> FeedResponse:
     """Generate a feed for the given courses."""
     logger.info(f"Generating feed for courses: {courses}, semester: {semester}")
@@ -32,27 +37,26 @@ def create_feed_service(
 
     processed_courses = []
     for course_id in course_ids:
+        path, group = None, None
         if re.fullmatch(settings.regex_course_id, course_id):
-            processed_courses.append(
-                find_or_create_course(
-                    session, path=course_id, group=settings.default_group, semester=semester
-                )
-            )
+            path, group = course_id, settings.default_group
         elif re.fullmatch(settings.regex_course_id_with_group, course_id):
             path, group = course_id.split("-")
-            processed_courses.append(
-                find_or_create_course(
-                    session, path=path, group=int(group), semester=semester
-                )
-            )
         else:
             raise ValueError(f"Invalid course ID format: {course_id}")
+
+        course = find_or_create_course(
+            session,
+            path=path,
+            group=int(group),
+            semester=semester,
+            remote_address=remote_address,
+        )
+        processed_courses.append(course)
 
     feed = find_or_create_feed(session, courses=processed_courses)
     feed_url = settings.feed_url_template.format(path=feed.path)
     logger.info(f"Successfully generated feed with URL: {feed_url}")
-
-    logger.info(f"Successfully generated Response with URL: {feed_url}")
 
     return FeedResponse(
         url=feed_url,
@@ -63,7 +67,9 @@ def create_feed_service(
     )
 
 
-def get_combined_feed_service(feed_id: str, session: Session) -> bytes:
+def get_combined_feed_service(
+    feed_id: str, session: Session, remote_address: str
+) -> bytes:
     """Retrieve the combined feed for the given feed ID."""
     logger.info(f"Retrieving combined feed for ID: {feed_id}")
     feed = session.exec(select(Feed).where(Feed.path == feed_id)).first()
@@ -77,7 +83,7 @@ def get_combined_feed_service(feed_id: str, session: Session) -> bytes:
             id=course.path, semester=course.semester, group=course.group
         )
         try:
-            response = requests.get(url, headers={"User-Agent": settings.user_agent})
+            response = request_limited(url=url, remote_address=remote_address)
             response.raise_for_status()
         except requests.RequestException as e:
             logger.error(f"Error fetching course {course.path}: {str(e)}")
