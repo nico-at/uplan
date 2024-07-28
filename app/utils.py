@@ -72,7 +72,7 @@ def generate_unique_path(session: Session) -> str:
     """Generate a unique path for a new feed."""
     for _ in range(100):  # Limit attempts to prevent infinite loop
         path = "".join(
-            random.choice(string.ascii_letters + string.digits)
+            random.choice(string.ascii_lowercase + string.digits)
             for _ in range(settings.default_feed_id_length)
         )
         if not session.exec(select(Feed).where(Feed.path == path)).first():
