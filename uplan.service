@@ -1,0 +1,15 @@
+[Unit]
+Description=Uplan App Docker Compose Service
+After=network.target docker.service
+Requires=docker.service
+
+[Service]
+User=uplan
+WorkingDirectory=/home/uplan/uplan
+ExecStart=/usr/local/bin/docker compose -f docker-compose.prod.yml up -d
+ExecStop=/usr/local/bin/docker compose -f docker-compose.prod.yml down
+Restart=always
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target

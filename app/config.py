@@ -3,8 +3,6 @@ from pydantic import PostgresDsn, RedisDsn, Field, computed_field
 
 
 class Settings(BaseSettings):
-    sqlite_url: str
-
     feed_url_template: str
     user_agent: str
 
