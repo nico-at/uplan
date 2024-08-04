@@ -3,6 +3,8 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+from fastapi.middleware.cors import CORSMiddleware
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from .routes import router
 from .database import create_db_and_tables
@@ -25,6 +27,14 @@ app = FastAPI(lifespan=lifespan, docs_url="/api-docs")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(router)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
@@ -36,3 +46,6 @@ async def log_requests(request: Request, call_next):
         f"Request: {request.method} {request.url.path} - Status: {response.status_code} - Process Time: {process_time:.2f}ms"
     )
     return response
+
+
+Instrumentator().instrument(app).expose(app)

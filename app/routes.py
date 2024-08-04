@@ -41,8 +41,8 @@ async def create_feed(
     - JSONResponse: A JSON response containing the generated feed.
     """
     try:
-        # await asyncio.sleep(1)
-        return create_feed_service(courses, semester, session, request.client.host)
+        await asyncio.sleep(1)
+        return await create_feed_service(courses, semester, session, request.client.host)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
@@ -68,7 +68,7 @@ async def get_combined_feed(
     - Response: An iCalendar (.ics) file containing the combined feed.
     """
     try:
-        result = get_combined_feed_service(id, session, request.client.host)
+        result = await get_combined_feed_service(id, session, request.client.host)
         return Response(
             content=result,
             media_type="text/calendar",

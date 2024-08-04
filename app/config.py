@@ -3,11 +3,12 @@ from pydantic import PostgresDsn, RedisDsn, Field, computed_field
 
 
 class Settings(BaseSettings):
-    feed_url_template: str
+    
     user_agent: str
 
     url_current_semester: str
     url_course_template: str
+    url_feed_template: str
     url_ics_template: str
 
     regex_current_semester: str
@@ -28,11 +29,11 @@ class Settings(BaseSettings):
     redis_dsn: RedisDsn
 
     # PostgreSQL settings
-    postgres_host: str = Field("localhost", env="POSTGRES_HOST")
-    postgres_port: int = Field(5432, env="POSTGRES_PORT")
-    postgres_db: str = Field(..., env="POSTGRES_DB")
-    postgres_user: str = Field(..., env="POSTGRES_USER")
-    postgres_password: str = Field(..., env="POSTGRES_PASSWORD")
+    postgres_host: str
+    postgres_port: int
+    postgres_db: str
+    postgres_user: str 
+    postgres_password: str
 
     @computed_field
     def postgres_dsn(self) -> PostgresDsn:

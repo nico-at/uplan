@@ -16,7 +16,7 @@ from .utils import (
 from .logger import logger
 
 
-def create_feed_service(
+async def create_feed_service(
     courses: str, semester: Optional[str], session: Session, remote_address: str
 ) -> FeedResponse:
     """Generate a feed for the given courses."""
@@ -55,7 +55,7 @@ def create_feed_service(
         processed_courses.append(course)
 
     feed = find_or_create_feed(session, courses=processed_courses)
-    feed_url = settings.feed_url_template.format(path=feed.path)
+    feed_url = settings.url_feed_template.format(path=feed.path)
     logger.info(f"Successfully generated feed with URL: {feed_url}")
 
     return FeedResponse(
@@ -67,7 +67,7 @@ def create_feed_service(
     )
 
 
-def get_combined_feed_service(
+async def get_combined_feed_service(
     feed_id: str, session: Session, remote_address: str
 ) -> bytes:
     """Retrieve the combined feed for the given feed ID."""

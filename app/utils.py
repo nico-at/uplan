@@ -63,6 +63,7 @@ def rate_limit(func):
 @rate_limit
 def request_limited(url: str | bytes, remote_address: str) -> requests.Response:
     """Limit the number of requests to a given URL for a given remote address."""
+    print(f"Requesting {url} from {remote_address}")
     response = cached_session.get(url, headers={"User-Agent": settings.user_agent})
     response.raise_for_status()
     return response
