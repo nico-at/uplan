@@ -7,7 +7,7 @@ document.getElementById('planForm').addEventListener('submit', function (e) {
     const submitButton = document.querySelector('button[type="submit"]');
 
     // Show loading message
-    resultDiv.innerHTML = 'Generating your ICS feed, please wait...';
+    resultDiv.innerHTML = 'Generating your ICS feed, this might take a few seconds...';
     resultDiv.className = 'success';
     submitButton.disabled = true;
 
