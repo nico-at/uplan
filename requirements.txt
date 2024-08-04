@@ -5,8 +5,11 @@ pydantic-settings
 sqlmodel
 icalendar
 fastapi
-slowapi
 requests-cache
 psycopg2
 pytest
 httpx
+uvicorn[standard]
+prometheus-fastapi-instrumentator
+uvloop; sys_platform != 'win32'
+httptools
