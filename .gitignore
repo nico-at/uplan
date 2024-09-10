@@ -13,3 +13,6 @@ __pycache__/
 
 # Test files (for now)
 test_*.py
+
+# Grafana config
+grafana/config.monitoring
