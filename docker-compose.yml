@@ -26,6 +26,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data  # Persistent volume for database
 
   prometheus:
     image: prom/prometheus
@@ -46,3 +48,6 @@ services:
       - "3000:3000"
     depends_on:
       - prometheus
+
+volumes:
+  postgres-data:
