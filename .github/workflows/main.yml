@@ -1,0 +1,36 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Deploy to VPS
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          cd /home/uplan/uplan
+
+          # Pull the latest changes
+          git pull
+
+          # If Dockerfile or docker-compose.yml has changed, rebuild the containers
+          if [[ $(git diff --name-only HEAD~1 HEAD | grep 'Dockerfile\|docker-compose.prod.yml') ]]; then
+            docker compose -f docker-compose.prod.yml build
+          fi
+
+          # Restart the systemd service
+          sudo systemctl restart uplan
+        EOF
