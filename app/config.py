@@ -1,9 +1,8 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import PostgresDsn, RedisDsn, Field, computed_field
+from pydantic import PostgresDsn, RedisDsn, computed_field
 
 
 class Settings(BaseSettings):
-    
     user_agent: str
 
     url_current_semester: str
@@ -32,7 +31,7 @@ class Settings(BaseSettings):
     postgres_host: str
     postgres_port: int
     postgres_db: str
-    postgres_user: str 
+    postgres_user: str
     postgres_password: str
 
     @computed_field
