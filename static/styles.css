@@ -27,6 +27,7 @@ body {
     width: 100%;
     max-width: 660px;
     box-sizing: border-box;
+    position: relative;
 }
 
 .description {
@@ -147,4 +148,30 @@ a {
 
 a:hover {
     text-decoration: underline;
+}
+
+.language-toggle {
+    position: absolute;
+    top: 1rem;
+    right: 2rem;
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    user-select: none;
+}
+
+.language-toggle:hover {
+    text-decoration: underline;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    font-size: 0.9rem;
+}
+
+.footer a {
+    margin: 0 1rem;
 }

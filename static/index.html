@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,37 +15,33 @@
     <meta property="og:description" content="Create automatically updating ICS feeds for your courses">
 </head>
 
-
 <body>
     <div class="container">
-        <h1>u:plan</h1>
-        <p class="description">Create automatically updating ICS feeds for your courses without violating the <a href="https://ufind.univie.ac.at/de/help.html#disclaimer" target="_blank">u:find terms</a>. These feeds can be easily added to any calendar app like iOS Calendar or Google Calendar,
-            keeping your schedule always up to date.</p>
+        <div class="language-toggle" id="languageToggle">en</div>
+        <h1 id="title">u:plan</h1>
+        <p id="description" class="description"></p>
         <form id="planForm">
             <div class="input-group">
                 <div class="input-wrapper">
-                    <label for="courses">Course IDs</label>
-                    <input type="text" id="courses" name="courses" required placeholder="Comma-separated e.g.,  051011,051012-3">
+                    <label for="courses" id="coursesLabel"></label>
+                    <input type="text" id="courses" name="courses"
+                        placeholder="IDs durch Beistrich getrennt, z.B. 051011,051012-3" required>
                 </div>
                 <div class="input-wrapper">
-                    <label for="semester">Semester</label>
+                    <label for="semester" id="semesterLabel"></label>
                     <select id="semester" name="semester" required>
-                        <option value="2023W">2025S</option>
+                        <option value="2025S">2025S</option>
                         <option value="2024W" selected>2024W</option>
                         <option value="2024S">2024S</option>
                     </select>
                 </div>
             </div>
-            <button type="submit">Create ICS Feed</button>
+            <button type="submit" id="submitButton"></button>
         </form>
         <div id="result"></div>
-        <div class="disclaimer">
-            <p><strong>Disclaimer:</strong> This application is not provided by the University of Vienna. The University
-                of Vienna assumes no responsibility for data accuracy and is not liable for any damages incurred by
-                users or third parties in connection with the use of this data.</p>
-        </div>
+        <div class="disclaimer" id="disclaimer"></div>
+        <!--<div class="footer"><a href="#" id="imprintLink"></a> <a href="#" id="privacyLink"></a> <a href="#" id="githubLink">GitHub</a></div>-->
     </div>
-
     <script src="static/script.js"></script>
 </body>
 
