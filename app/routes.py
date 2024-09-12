@@ -15,7 +15,17 @@ router = APIRouter()
 
 @router.get("/")
 async def index():
-    return FileResponse("static/index.html")
+    return FileResponse("static/index.html", media_type="text/html")
+
+
+@router.get("/robots.txt")
+async def robots():
+    return FileResponse("static/robots.txt", media_type="text/plain")
+
+
+@router.get("/sitemap.xml")
+async def sitemap():
+    return FileResponse("static/sitemap.xml", media_type="application/xml")
 
 
 @router.get(
@@ -42,7 +52,9 @@ async def create_feed(
     """
     try:
         await asyncio.sleep(1)
-        return await create_feed_service(courses, semester, session, request.client.host)
+        return await create_feed_service(
+            courses, semester, session, request.client.host
+        )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
