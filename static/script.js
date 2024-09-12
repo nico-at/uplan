@@ -1,7 +1,7 @@
 const translations = {
     de: {
         title: "u:plan",
-        description: "Erstelle ICS-Feeds für deine Lehrveranstaltungen ohne Verletzung der <a href='https://ufind.univie.ac.at/de/help.html#disclaimer' target='_blank'>u:find Nutzungsbedingungen</a>. Diese Feeds können zu jedem Kalender wie iOS Kalender oder Google Kalender hinzugefügt werden und halten Deinen Zeitplan immer aktuell.",
+        description: "Erstelle ICS-Feeds für Deine Lehrveranstaltungen ohne Verletzung der <a href='https://ufind.univie.ac.at/de/help.html#disclaimer' target='_blank'>u:find Nutzungsbedingungen</a>. Diese Feeds können zu den meisten Kalendern wie iOS Kalender oder Google Kalender hinzugefügt werden und halten Deinen Zeitplan immer aktuell.",
         coursesLabel: "Lehrveranstaltungen",
         coursesPlaceholder: "IDs durch Beistrich getrennt, z.B. 051011,051012-3,051131-5",
         semesterLabel: "Semester",
@@ -9,8 +9,8 @@ const translations = {
         disclaimer: "<strong>Haftungsausschluss:</strong> Diese Anwendung wird nicht von der Universität Wien bereitgestellt. Die Universität Wien übernimmt keine Verantwortung für die Datengenauigkeit und haftet nicht für etwaige Schäden, die Nutzern oder Dritten im Zusammenhang mit der Nutzung dieser Daten entstehen.",
         imprintLink: "Impressum",
         privacyLink: "Datenschutz",
-        loadingMessage: "Ihr ICS-Feed wird generiert, das kann einige Sekunden dauern...",
-        rateLimitMessage: "Zu viele Anfragen. Bitte versuchen Sie es später erneut."
+        loadingMessage: "Dein ICS-Feed wird generiert, das kann einige Sekunden dauern...",
+        rateLimitMessage: "Zu viele Anfragen. Bitte versuche es später erneut."
     },
     en: {
         title: "u:plan",

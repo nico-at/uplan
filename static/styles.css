@@ -11,10 +11,10 @@ body {
     color: var(--text-color);
     background-color: var(--bg-color);
     margin: 0;
-    padding: 6rem 0 0; /* Set a fixed padding-top */
+    padding: 6rem 0 0;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Align items to the start */
+    align-items: flex-start;
     min-height: 100vh;
 }
 
