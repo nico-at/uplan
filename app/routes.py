@@ -3,12 +3,13 @@ from fastapi.responses import Response, FileResponse
 from sqlmodel import Session
 from typing import Optional
 
-import asyncio
+import traceback
 
 from .database import get_session
 from .services import create_feed_service, get_combined_feed_service
 from .logger import logger
 from .models import FeedResponse
+from .utils import RateLimitException
 
 router = APIRouter()
 
@@ -39,7 +40,7 @@ async def create_feed(
     courses: str,
     semester: Optional[str] = None,
     session: Session = Depends(get_session),
-):
+) -> FeedResponse:
     """
     Generates an ICS feed for the specified courses and optional semester.
 
@@ -51,14 +52,17 @@ async def create_feed(
     - JSONResponse: A JSON response containing the generated feed.
     """
     try:
-        await asyncio.sleep(1)
         return await create_feed_service(
             courses, semester, session, request.client.host
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+    except RateLimitException as e:
+        raise HTTPException(status_code=429, detail=str(e))
+
     except Exception as e:
-        logger.error(f"Error generating feed: {str(e)}")
+        logger.error(f"Error generating feed: {str(e)}\n{traceback.format_exc()}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
@@ -69,7 +73,7 @@ async def create_feed(
 )
 async def get_combined_feed(
     request: Request, id: str, session: Session = Depends(get_session)
-):
+) -> Response:
     """
     Retrieves a combined feed based on the specified ID.
 
@@ -80,14 +84,19 @@ async def get_combined_feed(
     - Response: An iCalendar (.ics) file containing the combined feed.
     """
     try:
-        result = await get_combined_feed_service(id, session, request.client.host)
         return Response(
-            content=result,
+            content=await get_combined_feed_service(id, session, request.client.host),
             media_type="text/calendar",
-            headers={"Content-Disposition": "attachment; filename=combined_feed.ics"},
+            headers={
+                "Content-Disposition": f"attachment; filename=combined_feed_{id}.ics"
+            },
         )
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
+
+    except RateLimitException as e:
+        raise HTTPException(status_code=429, detail=str(e))
+
     except Exception as e:
         logger.error(f"Error retrieving combined feed: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
