@@ -27,12 +27,16 @@ cached_session = CachedSession(
 redis_client = redis.Redis(host=settings.redis_host, port=settings.redis_port)
 
 
+class RateLimitException(Exception):
+    pass
+
+
 def rate_limit(func):
     @wraps(func)
     def wrapper(url: str | bytes, remote_address: str, *args, **kwargs):
         if not remote_address:
             return func(url, remote_address, *args, **kwargs)
-        
+
         # Check rate limit
         rate_key = f"rate:{remote_address}"
         current_time = int(time.time())
@@ -44,7 +48,7 @@ def rate_limit(func):
         # Count requests in the current window
         request_count = redis_client.zcard(rate_key)
         if request_count >= settings.rate_limit_requests:
-            raise HTTPException(status_code=429, detail="Too Many Requests")
+            raise RateLimitException("Too Many Requests")
 
         # Make the request
         response = func(url, remote_address, *args, **kwargs)
@@ -63,7 +67,6 @@ def rate_limit(func):
 @rate_limit
 def request_limited(url: str | bytes, remote_address: str) -> requests.Response:
     """Limit the number of requests to a given URL for a given remote address."""
-    print(f"Requesting {url} from {remote_address}")
     response = cached_session.get(url, headers={"User-Agent": settings.user_agent})
     response.raise_for_status()
     return response
