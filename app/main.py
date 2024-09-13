@@ -1,4 +1,5 @@
-from datetime import datetime
+import time
+
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,6 +11,7 @@ from .routes import router
 from .database import create_db_and_tables
 from .logger import logger
 from .utils import get_current_semester
+from .config import settings
 
 
 @asynccontextmanager
@@ -17,13 +19,13 @@ async def lifespan(app: FastAPI):
     default_semester = get_current_semester()
     if not default_semester:
         logger.critical("Failed to fetch current semester. Exiting.")
-        exit(1)
+        raise RuntimeError("Failed to fetch current semester.")
     logger.info(f"Current Semester: {default_semester}")
     create_db_and_tables()
     yield
 
 
-app = FastAPI(lifespan=lifespan, docs_url="/api-docs")
+app = FastAPI(lifespan=lifespan, docs_url=None)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(router)
 
@@ -39,11 +41,15 @@ app.add_middleware(
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     """Middleware to log all incoming requests and their processing time."""
-    start_time = datetime.now()
+    start_time = time.perf_counter()
     response = await call_next(request)
-    process_time = (datetime.now() - start_time).total_seconds() * 1000
+    process_time = (time.perf_counter() - start_time) * 1000
+
+    user_agent = request.headers.get("user-agent", "unknown")
     logger.info(
-        f"Request: {request.method} {request.url.path} - Status: {response.status_code} - Process Time: {process_time:.2f}ms"
+        f"Request from {request.client.host}: {request.method} {request.url} - "
+        f"Status: {response.status_code} - Process Time: {process_time:.2f}ms - "
+        f"User Agent: {user_agent}"
     )
     return response
 
